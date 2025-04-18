@@ -24,8 +24,10 @@ if ! command -v redis-server &> /dev/null; then
   systemctl start redis-server
 fi
 
-# Trouver le chemin exact de npm
+# Trouver le chemin exact de node et npm
+NODE_PATH=$(which node)
 NPM_PATH=$(which npm)
+echo "Using node from: $NODE_PATH"
 echo "Using npm from: $NPM_PATH"
 
 # Créer un service systemd pour l'application
@@ -38,7 +40,7 @@ After=network.target redis-server.service
 Type=simple
 User=root
 WorkingDirectory=/root/hermes/apps/backend
-ExecStart=${NPM_PATH} start
+ExecStart=${NODE_PATH} /root/hermes/apps/backend/src/index.js
 Restart=on-failure
 Environment=NODE_ENV=production
 
