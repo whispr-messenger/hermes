@@ -31,24 +31,32 @@ echo "NPM version: $(npm -v)"
 # Mettre à jour npm pour éviter les problèmes d'installation
 npm install -g npm@latest
 
+# Installer node-pre-gyp globalement (nécessaire pour bcrypt)
+echo "Installation de node-pre-gyp..."
+npm install -g node-pre-gyp
+npm install -g node-gyp
+
 # Installer toutes les dépendances localement sans utiliser le cache
 npm cache clean --force
 
-# Installer les modules un par un avec --no-bin-links et --no-optional
-echo "Installation des modules individuellement..."
-npm install express --no-bin-links --no-optional
-npm install dotenv --no-bin-links --no-optional
-npm install bcrypt --no-bin-links --no-optional --build-from-source
-npm install ioredis --no-bin-links --no-optional
-npm install cors --no-bin-links --no-optional
-npm install morgan --no-bin-links --no-optional
-npm install socket.io --no-bin-links --no-optional
-npm install multer --no-bin-links --no-optional
-npm install jsonwebtoken --no-bin-links --no-optional
-npm install uuid --no-bin-links --no-optional
-npm install http --no-bin-links --no-optional
-npm install path --no-bin-links --no-optional
-npm install fs --no-bin-links --no-optional
+# Essayer d'abord une installation complète
+echo "Tentative d'installation complète..."
+npm install --unsafe-perm
+
+# Si l'installation complète échoue, installer les modules un par un
+if [ ! -d "node_modules/express" ] || [ ! -d "node_modules/dotenv" ] || [ ! -d "node_modules/bcrypt" ]; then
+  echo "Installation des modules individuellement..."
+  npm install express --no-optional
+  npm install dotenv --no-optional
+  npm install bcrypt --unsafe-perm --build-from-source
+  npm install ioredis --no-optional
+  npm install cors --no-optional
+  npm install morgan --no-optional
+  npm install socket.io --no-optional
+  npm install multer --no-optional
+  npm install jsonwebtoken --no-optional
+  npm install uuid --no-optional
+fi
 
 # Vérifier si les modules critiques sont correctement installés
 if [ ! -d "node_modules/express" ]; then
