@@ -15,15 +15,23 @@ echo "Configuration du service..."
 # Installer les dépendances de compilation
 echo "Installation des dépendances de compilation..."
 apt-get update
-apt-get install -y build-essential python3
+apt-get install -y build-essential python3 make g++
 
 # Installer les dépendances Node.js
 cd ~/hermes/apps/backend
-echo "Suppression du module bcrypt existant..."
-rm -rf node_modules/bcrypt
+echo "Nettoyage des modules node..."
+rm -rf node_modules
+rm -f package-lock.json
 
 echo "Installation des dépendances avec recompilation des modules natifs..."
 npm install --production
+npm install bcrypt --save
+
+# Vérifier que bcrypt est bien installé
+if [ ! -d "node_modules/bcrypt" ]; then
+  echo "Erreur: bcrypt n'a pas été installé correctement. Tentative d'installation spécifique..."
+  npm install bcrypt --build-from-source
+fi
 
 # Configurer Redis si ce n'est pas déjà fait
 if ! command -v redis-server &> /dev/null; then
