@@ -24,13 +24,15 @@ rm -rf node_modules
 rm -f package-lock.json
 
 echo "Installation des dépendances avec recompilation des modules natifs..."
-npm install --production
-npm install bcrypt --save
+# Installer toutes les dépendances, pas seulement les dépendances de production
+npm install
+# Installer explicitement les modules qui posent problème
+npm install dotenv bcrypt ioredis express cors morgan socket.io multer jsonwebtoken uuid
 
-# Vérifier que bcrypt est bien installé
-if [ ! -d "node_modules/bcrypt" ]; then
-  echo "Erreur: bcrypt n'a pas été installé correctement. Tentative d'installation spécifique..."
-  npm install bcrypt --build-from-source
+# Vérifier que les modules critiques sont bien installés
+if [ ! -d "node_modules/dotenv" ] || [ ! -d "node_modules/bcrypt" ]; then
+  echo "Erreur: modules critiques non installés. Tentative d'installation spécifique..."
+  npm install dotenv bcrypt --build-from-source
 fi
 
 # Configurer Redis si ce n'est pas déjà fait
