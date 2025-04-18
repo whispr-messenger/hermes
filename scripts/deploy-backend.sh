@@ -24,15 +24,37 @@ rm -rf node_modules
 rm -f package-lock.json
 
 echo "Installation des dépendances avec recompilation des modules natifs..."
-# Installer toutes les dépendances, pas seulement les dépendances de production
-npm install
-# Installer explicitement les modules qui posent problème
-npm install dotenv bcrypt ioredis express cors morgan socket.io multer jsonwebtoken uuid
+# Vérifier la version de npm et node
+echo "Node version: $(node -v)"
+echo "NPM version: $(npm -v)"
+
+# Installer les dépendances globalement pour s'assurer qu'elles sont accessibles
+npm install -g dotenv bcrypt ioredis express cors morgan socket.io multer jsonwebtoken uuid
+
+# Installer toutes les dépendances localement
+npm install --no-bin-links
+
+# Créer un répertoire uploads s'il n'existe pas
+mkdir -p ~/hermes/apps/backend/uploads
+chmod 755 ~/hermes/apps/backend/uploads
 
 # Vérifier que les modules critiques sont bien installés
 if [ ! -d "node_modules/dotenv" ] || [ ! -d "node_modules/bcrypt" ]; then
   echo "Erreur: modules critiques non installés. Tentative d'installation spécifique..."
-  npm install dotenv bcrypt --build-from-source
+  npm install dotenv bcrypt --build-from-source --no-bin-links
+  
+  # Vérifier à nouveau
+  if [ ! -d "node_modules/dotenv" ]; then
+    echo "Installation manuelle de dotenv..."
+    mkdir -p node_modules/dotenv
+    cp -r /usr/local/lib/node_modules/dotenv/* node_modules/dotenv/
+  fi
+  
+  if [ ! -d "node_modules/bcrypt" ]; then
+    echo "Installation manuelle de bcrypt..."
+    mkdir -p node_modules/bcrypt
+    cp -r /usr/local/lib/node_modules/bcrypt/* node_modules/bcrypt/
+  fi
 fi
 
 # Configurer Redis si ce n'est pas déjà fait
@@ -62,6 +84,7 @@ WorkingDirectory=/root/hermes/apps/backend
 ExecStart=${NODE_PATH} /root/hermes/apps/backend/src/index.js
 Restart=on-failure
 Environment=NODE_ENV=production
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/lib/node_modules
 
 [Install]
 WantedBy=multi-user.target
