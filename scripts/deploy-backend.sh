@@ -33,29 +33,30 @@ npm install -g npm@latest
 
 # Installer toutes les dépendances localement sans utiliser le cache
 npm cache clean --force
-npm install --no-bin-links --no-package-lock
 
-# Vérifier si les modules sont correctement installés
-if [ ! -d "node_modules/express" ] || [ ! -d "node_modules/dotenv" ] || [ ! -d "node_modules/bcrypt" ]; then
-  echo "Installation manuelle des modules critiques..."
-  
-  # Installer les modules un par un
-  npm install express --no-bin-links --no-package-lock
-  npm install dotenv --no-bin-links --no-package-lock
-  npm install bcrypt --no-bin-links --no-package-lock
-  npm install ioredis --no-bin-links --no-package-lock
-  npm install cors --no-bin-links --no-package-lock
-  npm install morgan --no-bin-links --no-package-lock
-  npm install socket.io --no-bin-links --no-package-lock
-  npm install multer --no-bin-links --no-package-lock
-  npm install jsonwebtoken --no-bin-links --no-package-lock
-  npm install uuid --no-bin-links --no-package-lock
-  
-  # Vérifier à nouveau
-  if [ ! -d "node_modules/express" ]; then
-    echo "ERREUR CRITIQUE: Impossible d'installer express"
-    exit 1
-  fi
+# Installer les modules un par un avec --no-bin-links et --no-optional
+echo "Installation des modules individuellement..."
+npm install express --no-bin-links --no-optional
+npm install dotenv --no-bin-links --no-optional
+npm install bcrypt --no-bin-links --no-optional --build-from-source
+npm install ioredis --no-bin-links --no-optional
+npm install cors --no-bin-links --no-optional
+npm install morgan --no-bin-links --no-optional
+npm install socket.io --no-bin-links --no-optional
+npm install multer --no-bin-links --no-optional
+npm install jsonwebtoken --no-bin-links --no-optional
+npm install uuid --no-bin-links --no-optional
+npm install http --no-bin-links --no-optional
+npm install path --no-bin-links --no-optional
+npm install fs --no-bin-links --no-optional
+
+# Vérifier si les modules critiques sont correctement installés
+if [ ! -d "node_modules/express" ]; then
+  echo "ERREUR CRITIQUE: Impossible d'installer express"
+  echo "Tentative d'installation globale..."
+  npm install -g express
+  mkdir -p node_modules/express
+  cp -r $(npm root -g)/express/* node_modules/express/
 fi
 
 # Créer un répertoire uploads s'il n'existe pas
@@ -104,7 +105,7 @@ ExecStart=${NODE_PATH} /root/hermes/apps/backend/src/index.js
 Restart=on-failure
 Environment=NODE_ENV=production
 Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/lib/node_modules
-Environment=NODE_PATH=/root/hermes/apps/backend/node_modules
+Environment=NODE_PATH=/root/hermes/apps/backend/node_modules:/usr/local/lib/node_modules
 
 [Install]
 WantedBy=multi-user.target
