@@ -4,10 +4,16 @@ const { v4: uuidv4 } = require('uuid');
 
 class UserService {
   static async createUser({ name, email, password, avatar = null }) {
-    // Check if user already exists
-    const existingUser = await this.getUserByEmail(email);
-    if (existingUser) {
-      throw new Error('User already exists');
+    // Check if user already exists with this email
+    const existingUserByEmail = await this.getUserByEmail(email);
+    if (existingUserByEmail) {
+      throw new Error('User with this email already exists');
+    }
+    
+    // Check if user already exists with this username
+    const existingUserByName = await this.getUserByName(name);
+    if (existingUserByName) {
+      throw new Error('Username already taken');
     }
     
     const userId = uuidv4();
@@ -26,6 +32,9 @@ class UserService {
     await redisClient.hset(`user:${userId}`, user);
     await redisClient.set(`user:email:${email}`, userId);
     
+    // Store username reference for uniqueness check
+    await redisClient.set(`user:name:${name}`, userId);
+    
     // Don't return the password
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
@@ -42,6 +51,13 @@ class UserService {
   
   static async getUserByEmail(email) {
     const userId = await redisClient.get(`user:email:${email}`);
+    if (!userId) return null;
+    
+    return this.getUserById(userId);
+  }
+  
+  static async getUserByName(name) {
+    const userId = await redisClient.get(`user:name:${name}`);
     if (!userId) return null;
     
     return this.getUserById(userId);
