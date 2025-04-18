@@ -5,7 +5,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 const authMiddleware = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    // Replace optional chaining with a more compatible approach
+    const authHeader = req.headers.authorization;
+    const token = authHeader ? authHeader.split(' ')[1] : null;
     
     if (!token) {
       return res.status(401).json({ message: 'Authentication required' });
