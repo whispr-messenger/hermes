@@ -24,8 +24,12 @@ if ! command -v redis-server &> /dev/null; then
   systemctl start redis-server
 fi
 
+# Trouver le chemin exact de npm
+NPM_PATH=$(which npm)
+echo "Using npm from: $NPM_PATH"
+
 # Créer un service systemd pour l'application
-cat > /etc/systemd/system/hermes-backend.service << 'EOL'
+cat > /etc/systemd/system/hermes-backend.service << EOL
 [Unit]
 Description=Hermes 3.0 Backend
 After=network.target redis-server.service
@@ -34,7 +38,7 @@ After=network.target redis-server.service
 Type=simple
 User=root
 WorkingDirectory=/root/hermes/apps/backend
-ExecStart=/usr/bin/npm start
+ExecStart=${NPM_PATH} start
 Restart=on-failure
 Environment=NODE_ENV=production
 
@@ -45,7 +49,11 @@ EOL
 # Recharger systemd, activer et démarrer le service
 systemctl daemon-reload
 systemctl enable hermes-backend
-systemctl start hermes-backend
+systemctl restart hermes-backend
+
+# Vérifier le statut du service
+echo "Checking service status..."
+systemctl status hermes-backend --no-pager
 
 # Nettoyer
 cd ~/hermes
