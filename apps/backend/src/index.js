@@ -19,7 +19,8 @@ const server = http.createServer(app);
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'http://192.168.1.22:3000'  // Ajout de votre adresse IP locale
+    'http://192.168.1.22:3000',
+    // Ajoutez d'autres origines si nécessaire
   ],
   credentials: true
 }));
@@ -105,7 +106,8 @@ const io = new Server(server, {
   cors: {
     origin: [
       'http://localhost:3000',
-      'http://192.168.1.22:3000'  // Ajout de votre adresse IP locale
+      'http://192.168.1.22:3000',
+      // Ajoutez d'autres origines si nécessaire
     ],
     methods: ["GET", "POST"],
     credentials: true
