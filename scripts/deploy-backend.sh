@@ -28,33 +28,52 @@ echo "Installation des dépendances avec recompilation des modules natifs..."
 echo "Node version: $(node -v)"
 echo "NPM version: $(npm -v)"
 
-# Installer les dépendances globalement pour s'assurer qu'elles sont accessibles
-npm install -g dotenv bcrypt ioredis express cors morgan socket.io multer jsonwebtoken uuid
+# Mettre à jour npm pour éviter les problèmes d'installation
+npm install -g npm@latest
 
-# Installer toutes les dépendances localement
-npm install --no-bin-links
+# Installer toutes les dépendances localement sans utiliser le cache
+npm cache clean --force
+npm install --no-bin-links --no-package-lock
+
+# Vérifier si les modules sont correctement installés
+if [ ! -d "node_modules/express" ] || [ ! -d "node_modules/dotenv" ] || [ ! -d "node_modules/bcrypt" ]; then
+  echo "Installation manuelle des modules critiques..."
+  
+  # Installer les modules un par un
+  npm install express --no-bin-links --no-package-lock
+  npm install dotenv --no-bin-links --no-package-lock
+  npm install bcrypt --no-bin-links --no-package-lock
+  npm install ioredis --no-bin-links --no-package-lock
+  npm install cors --no-bin-links --no-package-lock
+  npm install morgan --no-bin-links --no-package-lock
+  npm install socket.io --no-bin-links --no-package-lock
+  npm install multer --no-bin-links --no-package-lock
+  npm install jsonwebtoken --no-bin-links --no-package-lock
+  npm install uuid --no-bin-links --no-package-lock
+  
+  # Vérifier à nouveau
+  if [ ! -d "node_modules/express" ]; then
+    echo "ERREUR CRITIQUE: Impossible d'installer express"
+    exit 1
+  fi
+fi
 
 # Créer un répertoire uploads s'il n'existe pas
 mkdir -p ~/hermes/apps/backend/uploads
 chmod 755 ~/hermes/apps/backend/uploads
 
-# Vérifier que les modules critiques sont bien installés
-if [ ! -d "node_modules/dotenv" ] || [ ! -d "node_modules/bcrypt" ]; then
-  echo "Erreur: modules critiques non installés. Tentative d'installation spécifique..."
-  npm install dotenv bcrypt --build-from-source --no-bin-links
-  
-  # Vérifier à nouveau
-  if [ ! -d "node_modules/dotenv" ]; then
-    echo "Installation manuelle de dotenv..."
-    mkdir -p node_modules/dotenv
-    cp -r /usr/local/lib/node_modules/dotenv/* node_modules/dotenv/
-  fi
-  
-  if [ ! -d "node_modules/bcrypt" ]; then
-    echo "Installation manuelle de bcrypt..."
-    mkdir -p node_modules/bcrypt
-    cp -r /usr/local/lib/node_modules/bcrypt/* node_modules/bcrypt/
-  fi
+# Vérifier que le fichier .env existe
+if [ ! -f ".env" ]; then
+  echo "Création du fichier .env..."
+  cat > .env << EOL
+PORT=5001
+FRONTEND_URL=http://192.168.1.22:3000
+JWT_SECRET=your_super_secret_jwt_key
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+EOL
 fi
 
 # Configurer Redis si ce n'est pas déjà fait
@@ -85,6 +104,7 @@ ExecStart=${NODE_PATH} /root/hermes/apps/backend/src/index.js
 Restart=on-failure
 Environment=NODE_ENV=production
 Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/lib/node_modules
+Environment=NODE_PATH=/root/hermes/apps/backend/node_modules
 
 [Install]
 WantedBy=multi-user.target
