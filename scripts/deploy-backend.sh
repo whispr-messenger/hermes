@@ -12,8 +12,17 @@ tar -czf hermes-backend.tar.gz apps/backend
 # Configurer le service sur la machine locale
 echo "Configuration du service..."
 
-# Installer les dépendances
+# Installer les dépendances de compilation
+echo "Installation des dépendances de compilation..."
+apt-get update
+apt-get install -y build-essential python3
+
+# Installer les dépendances Node.js
 cd ~/hermes/apps/backend
+echo "Suppression du module bcrypt existant..."
+rm -rf node_modules/bcrypt
+
+echo "Installation des dépendances avec recompilation des modules natifs..."
 npm install --production
 
 # Configurer Redis si ce n'est pas déjà fait

@@ -102,6 +102,17 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 
 // Socket.io - CORRECTION: Définir io avant de l'utiliser
+// Mise à jour de la configuration CORS pour accepter les requêtes de votre IP locale
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://192.168.1.22:3000',
+    // Ajoutez d'autres origines si nécessaire
+  ],
+  credentials: true
+}));
+
+// Socket.io configuration
 const io = new Server(server, {
   cors: {
     origin: [
