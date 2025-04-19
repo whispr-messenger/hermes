@@ -38,13 +38,14 @@ defmodule WhisperBackend.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:swoosh, "~> 1.5"},
-      {:finch, "~> 0.13"},
+      {:finch, "~> 0.13", override: true},
+      {:mint, "~> 1.4", override: true},  # Add explicit mint dependency with version constraint
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"},
+      {:bandit, "~> 1.0"},  # Use an older version of bandit
       {:redix, "~> 1.2"},
       {:castore, "~> 1.0"},
       {:bcrypt_elixir, "~> 3.0"}
