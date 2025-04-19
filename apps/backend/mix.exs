@@ -5,7 +5,7 @@ defmodule WhisperBackend.MixProject do
     [
       app: :whisper_backend,
       version: "0.1.0",
-      elixir: "~> 1.12",
+      elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -38,17 +38,15 @@ defmodule WhisperBackend.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:swoosh, "~> 1.5"},
-      # Downgrade finch and mint to versions compatible with OTP 24
-      {:finch, "~> 0.12.0", override: true},
-      {:mint, "~> 1.0.0", override: true},
+      {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, ">= 0.5.10"},  # Use an even older version of bandit
-      {:redix, "~> 1.1"},
-      {:castore, "~> 0.1.0"},
+      {:bandit, "~> 1.5"},
+      {:redix, "~> 1.2"},
+      {:castore, "~> 1.0"},
       {:bcrypt_elixir, "~> 3.0"}
     ]
   end
