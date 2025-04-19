@@ -71,4 +71,32 @@ defmodule WhisperBackend.Messaging do
             
     Repo.one(query)
   end
+
+  @doc """
+  Updates a message.
+  """
+  def update_message(id, attrs, user_id) do
+    message = get_message(id)
+    
+    if message && message.sender_id == user_id do
+      message
+      |> Message.changeset(attrs)
+      |> Repo.update()
+    else
+      {:error, :unauthorized}
+    end
+  end
+
+  @doc """
+  Deletes a message.
+  """
+  def delete_message(id, user_id) do
+    message = get_message(id)
+    
+    if message && message.sender_id == user_id do
+      Repo.delete(message)
+    else
+      {:error, :unauthorized}
+    end
+  end
 end

@@ -76,4 +76,13 @@ defmodule WhisperBackend.Accounts do
     |> User.changeset(%{status: status})
     |> Repo.update()
   end
+
+  @doc """
+  Updates a user's profile.
+  """
+  def update_user_profile(user, attrs) do
+    user
+    |> User.changeset(attrs)
+    |> Repo.update()
+  end
 end
