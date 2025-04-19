@@ -46,7 +46,7 @@ defmodule WhisperBackend.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 0.9.0"},  # Use an even older version of bandit
+      {:bandit, ">= 0.5.10"},  # Use an even older version of bandit
       {:redix, "~> 1.1"},
       {:castore, "~> 0.1.0"},
       {:bcrypt_elixir, "~> 3.0"}
