@@ -20,7 +20,8 @@ config :whisper_backend, WhisperBackendWeb.Endpoint,
     layout: false
   ],
   pubsub_server: WhisperBackend.PubSub,
-  live_view: [signing_salt: "5qc7UmoL"]
+  live_view: [signing_salt: "5qc7UmoL"],
+  server: true
 
 # Configures the mailer
 #

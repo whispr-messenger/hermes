@@ -30,10 +30,10 @@ defmodule WhisperBackend.Media do
   def create_media_file(%{filename: filename, content_type: content_type, path: path}, user_id) do
     # Generate a unique filename
     unique_filename = "#{user_id}_#{:os.system_time(:millisecond)}_#{filename}"
-    
+
     # Determine media type from content_type
     media_type = get_media_type(content_type)
-    
+
     # Create the media file record
     %MediaFile{}
     |> MediaFile.changeset(%{
@@ -54,7 +54,7 @@ defmodule WhisperBackend.Media do
   def process_media(media_file) do
     # This would be implemented with a library like ImageMagick or FFmpeg
     # For now, we'll just simulate processing
-    
+
     # Update the media file status
     media_file
     |> MediaFile.changeset(%{status: "processed"})
@@ -72,7 +72,7 @@ defmodule WhisperBackend.Media do
         media_file
         |> MediaFile.changeset(%{status: "approved"})
         |> Repo.update()
-        
+
       {:error, reason} ->
         # Update the media file status
         media_file
@@ -93,7 +93,7 @@ defmodule WhisperBackend.Media do
     query = from m in MediaFile,
             where: m.user_id == ^user_id,
             order_by: [desc: m.inserted_at]
-            
+
     Repo.all(query)
   end
 
@@ -102,11 +102,11 @@ defmodule WhisperBackend.Media do
   """
   def delete_media_file(id, user_id) do
     media_file = get_media_file(id)
-    
+
     if media_file && media_file.user_id == user_id do
       # Delete the file from storage
       delete_file_from_storage(media_file)
-      
+
       # Delete the record
       Repo.delete(media_file)
     else
