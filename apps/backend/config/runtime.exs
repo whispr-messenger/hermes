@@ -21,18 +21,19 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
-  database_url =
-    System.get_env("DATABASE_URL") ||
-      raise """
-      environment variable DATABASE_URL is missing.
-      For example: ecto://USER:PASS@HOST/DATABASE
-      """
+  _database_url =
+      System.get_env("DATABASE_URL") ||
+        raise """
+        environment variable DATABASE_URL is missing.
+        For example: ecto://USER:PASS@HOST/DATABASE
+        """
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
+  # Modifiez la partie concernant la base de données pour permettre une configuration par défaut
   config :whisper_backend, WhisperBackend.Repo,
     # ssl: true,
-    url: database_url,
+    url: System.get_env("DATABASE_URL") || "ecto://postgres:postgres@localhost/whisper_backend_prod",
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
 
@@ -114,4 +115,9 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+  # Configuration Redis pour la production
+  redis_url = System.get_env("REDIS_URL") || "redis://localhost:6379"
+  
+  config :whisper_backend, :redis,
+    url: redis_url
 end

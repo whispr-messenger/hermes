@@ -1,6 +1,7 @@
 import Config
 
 # Configure your database
+# Ajoutez ou modifiez la configuration de la base de données
 config :whisper_backend, WhisperBackend.Repo,
   username: "postgres",
   password: "postgres",
@@ -64,3 +65,8 @@ config :phoenix, :plug_init_mode, :runtime
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# Ajouter ou modifier la configuration Redis
+config :whisper_backend, :redis,
+  host: "localhost",
+  port: 6379

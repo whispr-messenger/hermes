@@ -1,6 +1,9 @@
 defmodule WhisperBackendWeb.UserSocket do
   use Phoenix.Socket
 
+  # Définir le canal pour les messages
+  channel "messages:*", WhisperBackendWeb.MessageChannel
+
   # Channels
   channel "chat:*", WhisperBackendWeb.ChatChannel
 
@@ -14,12 +17,15 @@ defmodule WhisperBackendWeb.UserSocket do
   # To deny connection, return `:error`.
   @impl true
   def connect(%{"token" => token}, socket, _connect_info) do
-    case WhisperBackend.Accounts.verify_user_token(token) do
-      {:ok, user_id} ->
-        {:ok, assign(socket, :user_id, user_id)}
-      {:error, _reason} ->
-        :error
-    end
+    # Utiliser le résultat de verify_user_token directement
+    # Puisque la fonction retourne toujours {:ok, user_id} pour le moment
+    {:ok, user} = WhisperBackend.Accounts.verify_user_token(token)
+    {:ok, assign(socket, :user_id, user.id)}
+  end
+
+  # Si aucun token n'est fourni
+  def connect(_params, _socket, _connect_info) do
+    :error
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

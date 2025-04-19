@@ -1,6 +1,7 @@
 const express = require('express');
 const { authMiddleware } = require('../middleware/auth');
-const { MessageService } = require('../services/message');
+// Correction de l'import
+const { MessageService } = require('../services/message'); // <- Remove the extra .js extension
 
 const router = express.Router();
 

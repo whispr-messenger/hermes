@@ -17,11 +17,11 @@ router.get('/me', authMiddleware, async (req, res) => {
 router.get('/:userId', authMiddleware, async (req, res) => {
   try {
     const user = await UserService.getUserById(req.params.userId);
-    
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
+
     res.json(user);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -42,11 +42,11 @@ router.get('/', authMiddleware, async (req, res) => {
 router.put('/status', authMiddleware, async (req, res) => {
   try {
     const { status } = req.body;
-    
+
     if (!status) {
       return res.status(400).json({ message: 'Status is required' });
     }
-    
+
     const result = await UserService.updateUserStatus(req.userId, status);
     res.json(result);
   } catch (error) {

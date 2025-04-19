@@ -8,6 +8,8 @@ defmodule WhisperBackend.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      # Assurez-vous que Postgrex.TypeManager est démarré avant le Repo
+      {Postgrex, Application.get_env(:whisper_backend, WhisperBackend.Repo)},
       WhisperBackendWeb.Telemetry,
       WhisperBackend.Repo,
       {DNSCluster, query: Application.get_env(:whisper_backend, :dns_cluster_query) || :ignore},
@@ -17,7 +19,9 @@ defmodule WhisperBackend.Application do
       # Start a worker by calling: WhisperBackend.Worker.start_link(arg)
       # {WhisperBackend.Worker, arg},
       # Start to serve requests, typically the last entry
-      WhisperBackendWeb.Endpoint
+      WhisperBackendWeb.Endpoint,
+      # Ajouter la connexion Redis avec la configuration correcte
+      {Redix, Application.get_env(:whisper_backend, :redis)}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
