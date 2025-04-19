@@ -1,51 +1,51 @@
 defmodule WhisperBackendWeb.MediaController do
   use WhisperBackendWeb, :controller
-  
+
   alias WhisperBackend.Media
-  
-  def upload(conn, %{"file" => file_params}) do
-    user_id = conn.assigns.user_id
+  alias WhisperBackend.Media.MediaFile
+
+  action_fallback WhisperBackendWeb.FallbackController
+
+  def index(conn, _params) do
+    # Récupérer l'ID de l'utilisateur à partir du token JWT
+    user_id = conn.assigns.current_user.id
+    media_files = Media.get_user_media_files(user_id)
+    render(conn, :index, media_files: media_files)
+  end
+
+  def create(conn, %{"media" => media_params}) do
+    # Récupérer l'ID de l'utilisateur à partir du token JWT
+    user_id = conn.assigns.current_user.id
     
-    case Media.upload_media(file_params, user_id) do
-      {:ok, media_file} ->
-        conn
-        |> put_status(:created)
-        |> render(:show, media_file: media_file)
-        
-      {:error, reason} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(:error, reason: reason)
+    with {:ok, %MediaFile{} = media_file} <- Media.upload_media(media_params, user_id) do
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", ~p"/api/media/#{media_file}")
+      |> render(:show, media_file: media_file)
     end
   end
-  
+
   def show(conn, %{"id" => id}) do
+    # Récupérer l'ID de l'utilisateur à partir du token JWT
+    user_id = conn.assigns.current_user.id
+    
     media_file = Media.get_media_file(id)
     
-    if media_file do
-      conn
-      |> put_resp_content_type(media_file.content_type)
-      |> send_file(200, "uploads/#{media_file.filename}")
+    if media_file && (media_file.user_id == user_id || media_file.public) do
+      render(conn, :show, media_file: media_file)
     else
       conn
       |> put_status(:not_found)
-      |> render("error.json", reason: "Media file not found")
+      |> json(%{error: "Media file not found"})
     end
   end
-  
+
   def delete(conn, %{"id" => id}) do
-    user_id = conn.assigns.user_id
+    # Récupérer l'ID de l'utilisateur à partir du token JWT
+    user_id = conn.assigns.current_user.id
     
-    case Media.delete_media_file(id, user_id) do
-      {:ok, _} ->
-        conn
-        |> put_status(:no_content)
-        |> send_resp(:no_content, "")
-        
-      {:error, reason} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render("error.json", reason: reason)
+    with {:ok, %MediaFile{}} <- Media.delete_media_file(id, user_id) do
+      send_resp(conn, :no_content, "")
     end
   end
 end

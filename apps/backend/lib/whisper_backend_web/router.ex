@@ -18,21 +18,15 @@ defmodule WhisperBackendWeb.Router do
     post "/login", AuthController, :login
   end
 
+  # Ajouter dans le scope "/api" qui utilise le pipeline :api
   scope "/api", WhisperBackendWeb do
-    pipe_through :auth
-    
-    # Routes pour les médias
-    post "/media/upload", MediaController, :upload
-    get "/media/:id", MediaController, :show
-    delete "/media/:id", MediaController, :delete
-    
-    # Autres routes protégées
-  end
+    pipe_through [:api, :auth]  # Assurez-vous que :auth est défini pour vérifier le JWT
 
-  # Remplacez cette partie qui cause l'erreur
-  # scope "/dev" do
-  #   ...
-  # end
+    # Routes existantes...
+    
+    resources "/media", MediaController, except: [:new, :edit, :update]
+    get "/media/:id/download", MediaController, :download
+  end
   
   # Si vous avez besoin de routes de développement, utilisez ceci à la place :
   if Mix.env() == :dev do

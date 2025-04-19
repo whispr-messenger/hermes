@@ -7,13 +7,13 @@ defmodule WhisperBackend.Media.ContentModeration do
   Checks if a media file contains inappropriate content.
   """
   def check_content(media_file) do
-    # This would use a content moderation API or ML model
-    # For now, we'll just simulate moderation
+    # Pour l'instant, nous simulons la modération
+    # Dans une application réelle, vous utiliseriez un service comme AWS Rekognition
+    # ou Google Cloud Vision API pour détecter le contenu inapproprié
     
-    # Generate a hash for the media file
+    # Simulons une vérification basée sur le hash du média
     media_hash = media_file.media_hash || "no_hash"
     
-    # Check if the hash is in a blacklist
     if is_blacklisted?(media_hash) do
       {:error, "Content violates community guidelines"}
     else
@@ -21,19 +21,9 @@ defmodule WhisperBackend.Media.ContentModeration do
     end
   end
 
-  # Suppression de l'attribut @doc pour la fonction privée
   defp is_blacklisted?(_media_hash) do
-    # This would check a database of blacklisted hashes
-    # For now, we'll just return false
+    # Vérification simulée - toujours retourne false
+    # Dans une application réelle, vous vérifieriez une base de données de hashes blacklistés
     false
-  end
-
-  @doc """
-  Reports a media file for moderation.
-  """
-  def report_media(_media_id, _reporter_id, _reason) do
-    # This would create a report for manual review
-    # For now, we'll just return :ok
-    :ok
   end
 end
