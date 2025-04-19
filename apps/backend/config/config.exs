@@ -13,7 +13,7 @@ config :whisper_backend,
 
 # Configures the endpoint
 config :whisper_backend, WhisperBackendWeb.Endpoint,
-  url: [host: "localhost"],
+  http: [ip: {0, 0, 0, 0}, port: 4000],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [json: WhisperBackendWeb.ErrorJSON],
